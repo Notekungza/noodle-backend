@@ -60,7 +60,7 @@ app.post('/api/orders', (req, res) => {
 
 // 4. API สำหรับเปิดดูรายการออเดอร์ก๋วยเตี๋ยวทั้งหมด (GET)
 app.get('/api/orders', (req, res) => {
-    db.all(`SELECT * FROM orders ORDER BY created_at DESC`, [], (err, rows) => {
+    db.all(`SELECT * FROM orders ORDER BY CURRENT_TIMESTAMP DESC`, [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -68,6 +68,17 @@ app.get('/api/orders', (req, res) => {
     });
 });
 
+// 5. ลบ
+app.delete('/api/orders/:id', (req, res) => {
+    const { id } = req.params;
+    db.run("DELETE FROM orders WHERE id = ?", id, function(err) {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ error: 'ไม่สามารถลบข้อมูลได้' });
+        }
+        res.json({ message: `ลบคิวที่ ${id} เรียบร้อยแล้ว` });
+    });
+});
 // เริ่มต้นเปิดระบบพอร์ต
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
