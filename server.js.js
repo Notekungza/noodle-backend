@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 
-// ปรับให้ดึง PORT จากคลาวด์ (Render) ถ้าไม่มีค่อยใช้พอร์ต 3000 (รันในเครื่องเราเอง)
+// ดึง PORT จากคลาวด์ ถ้าไม่มีค่อยใช้พอร์ต 3000
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
@@ -60,7 +60,7 @@ app.post('/api/orders', (req, res) => {
 
 // 4. API สำหรับเปิดดูรายการออเดอร์ก๋วยเตี๋ยวทั้งหมด (GET)
 app.get('/api/orders', (req, res) => {
-    db.all(`SELECT * FROM orders ORDER BY created_at DESC`, [], (err, rows) => {
+    db.all(`SELECT * FROM orders ORDER BY CURRENT_TIMESTAMP DESC`, [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
