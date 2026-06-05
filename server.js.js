@@ -4,12 +4,14 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+
+// ปรับให้ดึง PORT จากคลาวด์ (Render) ถ้าไม่มีค่อยใช้พอร์ต 3000 (รันในเครื่องเราเอง)
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-// 1. เชื่อมต่อฐานข้อมูล SQLite (เปลี่ยนมาใช้ชื่อไฟล์เฉพาะตัว)
+// 1. เชื่อมต่อฐานข้อมูล SQLite
 const dbPath = path.resolve(__dirname, 'restaurant.db');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
@@ -18,7 +20,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.log('🔌 เชื่อมต่อฐานข้อมูล SQLite (restaurant.db) สำเร็จแล้ว!');
 });
 
-// 2. สร้างตารางเก็บออเดอร์ก๋วยเตี๋ยวให้ตรงกับหน้าเว็บ (menu_name, soup, toppings)
+// 2. สร้างตารางเก็บออเดอร์ก๋วยเตี๋ยวให้ตรงกับหน้าเว็บ
 db.run(`
     CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,7 +41,6 @@ db.run(`
 app.post('/api/orders', (req, res) => {
     const { menu_name, soup, toppings } = req.body;
 
-    // ตรวจสอบความถูกต้องของข้อมูลเบื้องต้น
     if (!menu_name || !soup) {
         return res.status(400).json({ error: 'ข้อมูลออเดอร์ไม่ครบถ้วน' });
     }
@@ -67,8 +68,7 @@ app.get('/api/orders', (req, res) => {
     });
 });
 
-// เริ่มต้นเปิดระบบพอร์ต (อัปเดตเพื่อรองรับ Render)
-const PORT = process.env.PORT || 3000;
+// เริ่มต้นเปิดระบบพอร์ต
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
